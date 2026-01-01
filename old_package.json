@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@types/node": "^24.2.1",
-    "csv-parse": "^6.1.0"
-  }
-}
