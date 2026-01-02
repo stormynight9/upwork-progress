@@ -10,6 +10,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { BuyMeACoffee } from "@/components/buy-me-a-coffee";
 
 export default function Page() {
   const [error, setError] = useState<string>("");
@@ -114,6 +115,21 @@ export default function Page() {
         )}
 
         {result && <MilestoneResults result={result} />}
+
+        {transactions && transactions.length > 0 && (
+          <div className="pt-6 border-t space-y-4">
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Enjoying this tool? If it helped you track your progress,
+                consider supporting me!{" "}
+                <span className="animate-heartbeat">❤️</span>
+              </p>
+            </div>
+            <div className="flex justify-center">
+              <BuyMeACoffee username="naderferjani" />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
