@@ -211,13 +211,17 @@ export function CSVUploader({ onFileParsed, onError }: CSVUploaderProps) {
                   Choose File
                 </Button>
               </div>
+              <div className="text-xs text-muted-foreground">
+                All calculations happen in your browser. Nothing is sent to any
+                server.
+              </div>
             </div>
           )}
         </div>
         <div className="mt-6 pt-6 border-t">
-          <details className="group">
+          <details className="group" open>
             <summary className="cursor-pointer text-sm font-medium text-foreground hover:text-primary transition-colors">
-              How to download your CSV from Upwork
+              How to download your CSV from Upwork (Desktop only)
             </summary>
             <div className="mt-4 space-y-2 text-sm text-muted-foreground">
               <ol className="list-decimal list-inside space-y-2 ml-2">
