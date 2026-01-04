@@ -45,35 +45,6 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
         </div>
       </div>
 
-      {/* Performance Metrics */}
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Performance Metrics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <StatCard
-            title="Earnings Rate (Per Day)"
-            value={stats.earningsRate.perDay}
-          />
-          <StatCard
-            title="Earnings Rate (Per Week)"
-            value={stats.earningsRate.perWeek}
-          />
-          <StatCard
-            title="Earnings Rate (Per Month)"
-            value={stats.earningsRate.perMonth}
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-          <StatCard
-            title="Average Transaction Size"
-            value={stats.averageTransactionSize}
-          />
-          <StatCard
-            title="Total Transactions"
-            value={stats.totalTransactions}
-          />
-        </div>
-      </div>
-
       {/* Best/Worst Months */}
       {(stats.bestWorstMonths.best || stats.bestWorstMonths.worst) && (
         <Card>
