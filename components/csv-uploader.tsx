@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+import type { Transaction } from "@/lib/milestone-calculator";
+
 interface CSVUploaderProps {
-  onFileParsed: (transactions: Array<{ date: Date; amount: number }>) => void;
+  onFileParsed: (transactions: Transaction[]) => void;
   onError: (error: string) => void;
 }
 
@@ -87,12 +89,55 @@ export function CSVUploader({ onFileParsed, onError }: CSVUploaderProps) {
                     return null;
                   }
 
-                  return {
+                  // Extract additional fields
+                  const transactionType = record["Transaction type"] as
+                    | string
+                    | undefined;
+                  const client = record["Client team"] as string | undefined;
+                  const project = record["Transaction summary"] as
+                    | string
+                    | undefined;
+
+                  const transaction: Transaction = {
                     date,
                     amount,
                   };
+
+                  if (transactionType) {
+                    const validTypes = [
+                      "Hourly",
+                      "Fixed-price",
+                      "Service Fee",
+                      "Withdrawal",
+                      "Withdrawal Fee",
+                      "Bonus",
+                    ] as const;
+                    if (
+                      validTypes.includes(
+                        transactionType as (typeof validTypes)[number]
+                      )
+                    ) {
+                      transaction.transactionType = transactionType as
+                        | "Hourly"
+                        | "Fixed-price"
+                        | "Service Fee"
+                        | "Withdrawal"
+                        | "Withdrawal Fee"
+                        | "Bonus";
+                    }
+                  }
+
+                  if (client) {
+                    transaction.client = client;
+                  }
+
+                  if (project) {
+                    transaction.project = project;
+                  }
+
+                  return transaction;
                 })
-                .filter((t): t is { date: Date; amount: number } => t !== null);
+                .filter((t) => t !== null);
 
               if (transactions.length === 0) {
                 onError("No valid transactions found in the CSV file.");

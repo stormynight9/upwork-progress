@@ -3,20 +3,26 @@
 import { useState, useMemo } from "react";
 import { CSVUploader } from "@/components/csv-uploader";
 import { MilestoneResults } from "@/components/milestone-results";
+import { StatisticsDashboard } from "@/components/statistics-dashboard";
 import {
   calculateMilestones,
   type Transaction,
 } from "@/lib/milestone-calculator";
+import { calculateStatistics } from "@/lib/statistics-calculator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BuyMeACoffee } from "@/components/buy-me-a-coffee";
+import { Button } from "@/components/ui/button";
+
+type ViewMode = "milestones" | "statistics";
 
 export default function Page() {
   const [error, setError] = useState<string>("");
   const [transactions, setTransactions] = useState<Transaction[] | null>(null);
   const [milestoneAmountInput, setMilestoneAmountInput] =
     useState<string>("1000");
+  const [viewMode, setViewMode] = useState<ViewMode>("milestones");
 
   const result = useMemo(() => {
     if (!transactions || transactions.length === 0) {
@@ -33,6 +39,13 @@ export default function Page() {
     }
     return calculated;
   }, [transactions, milestoneAmountInput]);
+
+  const statistics = useMemo(() => {
+    if (!transactions || transactions.length === 0) {
+      return null;
+    }
+    return calculateStatistics(transactions);
+  }, [transactions]);
 
   const displayError = useMemo(() => {
     if (error) return error;
@@ -99,7 +112,8 @@ export default function Page() {
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold">Upwork Progress Tracker</h1>
           <p className="text-muted-foreground">
-            Upload your transaction CSV to see your milestone progress
+            Upload your transaction CSV to see your milestone progress and
+            detailed statistics
           </p>
         </div>
 
@@ -144,7 +158,37 @@ export default function Page() {
           </Card>
         )}
 
-        {result && <MilestoneResults result={result} />}
+        {transactions && transactions.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>View Mode</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2">
+                <Button
+                  variant={viewMode === "milestones" ? "default" : "outline"}
+                  onClick={() => setViewMode("milestones")}
+                >
+                  Milestones
+                </Button>
+                <Button
+                  variant={viewMode === "statistics" ? "default" : "outline"}
+                  onClick={() => setViewMode("statistics")}
+                >
+                  Statistics
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {viewMode === "milestones" && result && (
+          <MilestoneResults result={result} />
+        )}
+
+        {viewMode === "statistics" && statistics && (
+          <StatisticsDashboard stats={statistics} />
+        )}
 
         {transactions && transactions.length > 0 && (
           <div className="pt-6 border-t space-y-4">

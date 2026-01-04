@@ -1,6 +1,17 @@
+export type TransactionType =
+  | "Hourly"
+  | "Fixed-price"
+  | "Service Fee"
+  | "Withdrawal"
+  | "Withdrawal Fee"
+  | "Bonus";
+
 export interface Transaction {
   date: Date;
   amount: number;
+  transactionType?: TransactionType;
+  client?: string;
+  project?: string;
 }
 
 export interface Milestone {
