@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -8,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/stat-card";
 import type { StatisticsResult } from "@/lib/statistics-calculator";
 
@@ -16,6 +18,8 @@ interface StatisticsDashboardProps {
 }
 
 export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
+  const [blurClients, setBlurClients] = useState(false);
+  const [blurProjects, setBlurProjects] = useState(false);
   return (
     <div className="space-y-6">
       {/* Financial Summary Cards */}
@@ -111,7 +115,16 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
       {stats.earningsByClient.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Earnings by Client</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Earnings by Client</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setBlurClients(!blurClients)}
+              >
+                {blurClients ? "Show names" : "Hide names"}
+              </Button>
+            </div>
             <CardDescription>
               Breakdown of earnings by client team (
               {stats.earningsByClient.length}{" "}
@@ -141,7 +154,13 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
                       key={index}
                       className="border-b last:border-0 hover:bg-muted/50 transition-colors"
                     >
-                      <td className="py-2 px-4">{client.client}</td>
+                      <td
+                        className={`py-2 px-4 ${
+                          blurClients ? "blur-xs select-none" : ""
+                        }`}
+                      >
+                        {client.client}
+                      </td>
                       <td className="py-2 px-4 text-right font-medium">
                         $
                         {client.total.toLocaleString(undefined, {
@@ -168,7 +187,16 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
       {stats.earningsByProject.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Earnings by Project</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>Earnings by Project</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setBlurProjects(!blurProjects)}
+              >
+                {blurProjects ? "Show names" : "Hide names"}
+              </Button>
+            </div>
             <CardDescription>
               Breakdown of earnings by project/contract (
               {stats.earningsByProject.length}{" "}
@@ -198,7 +226,13 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
                       key={index}
                       className="border-b last:border-0 hover:bg-muted/50 transition-colors"
                     >
-                      <td className="py-2 px-4">{project.project}</td>
+                      <td
+                        className={`py-2 px-4 ${
+                          blurProjects ? "blur-xs select-none" : ""
+                        }`}
+                      >
+                        {project.project}
+                      </td>
                       <td className="py-2 px-4 text-right font-medium">
                         $
                         {project.total.toLocaleString(undefined, {

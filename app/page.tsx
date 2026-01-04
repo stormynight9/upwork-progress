@@ -119,37 +119,6 @@ export default function Page() {
 
         <CSVUploader onFileParsed={handleFileParsed} onError={handleError} />
 
-        {transactions && transactions.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Milestone Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <Label htmlFor="milestone-amount">Milestone Amount ($)</Label>
-                <Input
-                  id="milestone-amount"
-                  type="number"
-                  min="1000"
-                  step="1"
-                  value={milestoneAmountInput}
-                  onChange={handleMilestoneAmountChange}
-                  className="max-w-xs"
-                />
-                {!isValidMilestoneAmount && milestoneAmountInput !== "" && (
-                  <p className="text-xs text-destructive">
-                    Minimum milestone amount is $1,000
-                  </p>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Set the milestone increment amount (minimum: $1,000, e.g.,
-                  1000, 2000, 5000)
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {displayError && (
           <Card>
             <CardContent className="p-4">
@@ -181,6 +150,39 @@ export default function Page() {
             </CardContent>
           </Card>
         )}
+
+        {viewMode === "milestones" &&
+          transactions &&
+          transactions.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Milestone Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="milestone-amount">Milestone Amount ($)</Label>
+                  <Input
+                    id="milestone-amount"
+                    type="number"
+                    min="1000"
+                    step="1"
+                    value={milestoneAmountInput}
+                    onChange={handleMilestoneAmountChange}
+                    className="max-w-xs"
+                  />
+                  {!isValidMilestoneAmount && milestoneAmountInput !== "" && (
+                    <p className="text-xs text-destructive">
+                      Minimum milestone amount is $1,000
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Set the milestone increment amount (minimum: $1,000, e.g.,
+                    1000, 2000, 5000)
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
         {viewMode === "milestones" && result && (
           <MilestoneResults result={result} />
