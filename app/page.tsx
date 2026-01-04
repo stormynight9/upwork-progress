@@ -42,9 +42,39 @@ export default function Page() {
     return "";
   }, [error, transactions, result]);
 
+  // Calculate dynamic milestone based on total earnings
+  const calculateDefaultMilestone = (totalEarnings: number): number => {
+    // Thresholds in descending order: [100k, 50k, 20k]
+    // Milestone = threshold / 10
+    const thresholds = [
+      { threshold: 100000, milestone: 10000 },
+      { threshold: 50000, milestone: 5000 },
+      { threshold: 20000, milestone: 2000 },
+    ];
+
+    // Find the first threshold the user has crossed
+    for (const { threshold, milestone } of thresholds) {
+      if (totalEarnings >= threshold) {
+        return milestone;
+      }
+    }
+
+    // Default to $1k if below all thresholds
+    return 1000;
+  };
+
   const handleFileParsed = (newTransactions: Transaction[]) => {
     setTransactions(newTransactions);
     setError("");
+
+    // Calculate total earnings (sum of positive transactions)
+    const totalEarnings = newTransactions
+      .filter((t) => t.amount > 0)
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    // Set default milestone dynamically based on earnings
+    const defaultMilestone = calculateDefaultMilestone(totalEarnings);
+    setMilestoneAmountInput(defaultMilestone.toString());
   };
 
   const handleError = (errorMessage: string) => {

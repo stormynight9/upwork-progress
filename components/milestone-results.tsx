@@ -139,7 +139,7 @@ export function MilestoneResults({ result }: MilestoneResultsProps) {
       {result.daysSinceLastMilestone !== null && (
         <Card>
           <CardHeader>
-            <CardTitle>Time Since Last Milestone</CardTitle>
+            <CardTitle>Days Since Last Milestone</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-medium">
