@@ -13,6 +13,7 @@ interface CSVUploaderProps {
 export function CSVUploader({ onFileParsed, onError }: CSVUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isInstructionsOpen, setIsInstructionsOpen] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const parseCSV = useCallback(
@@ -100,6 +101,7 @@ export function CSVUploader({ onFileParsed, onError }: CSVUploaderProps) {
               }
 
               onFileParsed(transactions);
+              setIsInstructionsOpen(false);
               setIsProcessing(false);
             } catch (error) {
               onError(
@@ -219,7 +221,7 @@ export function CSVUploader({ onFileParsed, onError }: CSVUploaderProps) {
           )}
         </div>
         <div className="mt-6 pt-6 border-t">
-          <details className="group" open>
+          <details className="group" open={isInstructionsOpen}>
             <summary className="cursor-pointer text-sm font-medium text-foreground hover:text-primary transition-colors">
               How to download your CSV from Upwork (Desktop only)
             </summary>
