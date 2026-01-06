@@ -39,11 +39,20 @@ export interface BestWorstMonths {
   worst: MonthlyEarnings | null;
 }
 
+export interface WithdrawalByMethod {
+  method: string;
+  total: number;
+  feeTotal: number;
+  netTotal: number;
+  transactionCount: number;
+}
+
 export interface StatisticsResult {
   grossEarnings: number;
   totalServiceFees: number;
   netEarnings: number;
   totalWithdrawals: number;
+  withdrawalsByMethod: WithdrawalByMethod[];
   earningsByClient: ClientEarnings[];
   earningsByProject: ProjectEarnings[];
   earningsByType: TypeEarnings[];
@@ -98,6 +107,46 @@ export function calculateStatistics(
   const totalWithdrawals = Math.abs(
     withdrawalTransactions.reduce((sum, t) => sum + t.amount, 0)
   );
+
+  // Withdrawals by payment method
+  const withdrawalMethodMap = new Map<
+    string,
+    { total: number; feeTotal: number; withdrawalCount: number }
+  >();
+  withdrawalTransactions.forEach((t) => {
+    const method = t.paymentMethod || "Unknown";
+    const existing = withdrawalMethodMap.get(method) || {
+      total: 0,
+      feeTotal: 0,
+      withdrawalCount: 0,
+    };
+    const amount = Math.abs(t.amount);
+    if (t.transactionType === "Withdrawal Fee") {
+      withdrawalMethodMap.set(method, {
+        ...existing,
+        feeTotal: existing.feeTotal + amount,
+      });
+    } else {
+      // Only count actual withdrawals, not fees
+      withdrawalMethodMap.set(method, {
+        ...existing,
+        total: existing.total + amount,
+        withdrawalCount: existing.withdrawalCount + 1,
+      });
+    }
+  });
+
+  const withdrawalsByMethod: WithdrawalByMethod[] = Array.from(
+    withdrawalMethodMap.entries()
+  )
+    .map(([method, data]) => ({
+      method,
+      total: data.total,
+      feeTotal: data.feeTotal,
+      netTotal: data.total - data.feeTotal,
+      transactionCount: data.withdrawalCount, // Only count actual withdrawals
+    }))
+    .sort((a, b) => b.total - a.total);
 
   // Net earnings (gross minus service fees)
   const netEarnings = grossEarnings - totalServiceFees;
@@ -204,6 +253,7 @@ export function calculateStatistics(
       totalServiceFees: 0,
       netEarnings: 0,
       totalWithdrawals: 0,
+      withdrawalsByMethod,
       earningsByClient: [],
       earningsByProject: [],
       earningsByType: [],
@@ -284,6 +334,7 @@ export function calculateStatistics(
     totalServiceFees,
     netEarnings,
     totalWithdrawals,
+    withdrawalsByMethod,
     earningsByClient,
     earningsByProject,
     earningsByType,

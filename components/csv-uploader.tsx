@@ -97,6 +97,21 @@ export function CSVUploader({ onFileParsed, onError }: CSVUploaderProps) {
                   const project = record["Transaction summary"] as
                     | string
                     | undefined;
+                  const paymentMethodColumn = record["Payment method"] as
+                    | string
+                    | undefined;
+                  const transactionSummary = record["Transaction summary"] as
+                    | string
+                    | undefined;
+
+                  // For withdrawals, payment method is in Transaction summary or Payment method column
+                  let paymentMethod: string | undefined;
+                  if (
+                    transactionType === "Withdrawal" ||
+                    transactionType === "Withdrawal Fee"
+                  ) {
+                    paymentMethod = paymentMethodColumn || transactionSummary;
+                  }
 
                   const transaction: Transaction = {
                     date,
@@ -133,6 +148,10 @@ export function CSVUploader({ onFileParsed, onError }: CSVUploaderProps) {
 
                   if (project) {
                     transaction.project = project;
+                  }
+
+                  if (paymentMethod) {
+                    transaction.paymentMethod = paymentMethod;
                   }
 
                   return transaction;

@@ -12,6 +12,7 @@ export interface Transaction {
   transactionType?: TransactionType;
   client?: string;
   project?: string;
+  paymentMethod?: string;
 }
 
 export interface Milestone {

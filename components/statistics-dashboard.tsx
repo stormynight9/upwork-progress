@@ -48,7 +48,6 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
           />
         </div>
       </div>
-
       {/* Best/Worst Months */}
       {(stats.bestWorstMonths.best || stats.bestWorstMonths.worst) && (
         <Card>
@@ -106,6 +105,77 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
                   </div>
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Withdrawals by Payment Method */}
+      {stats.withdrawalsByMethod.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Withdrawals by Payment Method</CardTitle>
+            <CardDescription>
+              Breakdown of withdrawals by payment method (
+              {stats.withdrawalsByMethod.length}{" "}
+              {stats.withdrawalsByMethod.length === 1 ? "method" : "methods"})
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 px-4 font-medium">
+                      Payment Method
+                    </th>
+                    <th className="text-right py-2 px-4 font-medium">
+                      Total Withdrawn
+                    </th>
+                    <th className="text-right py-2 px-4 font-medium">Fees</th>
+                    <th className="text-right py-2 px-4 font-medium">
+                      Net Amount
+                    </th>
+                    <th className="text-right py-2 px-4 font-medium">
+                      Transactions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stats.withdrawalsByMethod.map((method, index) => (
+                    <tr
+                      key={index}
+                      className="border-b last:border-0 hover:bg-muted/50 transition-colors"
+                    >
+                      <td className="py-2 px-4">{method.method}</td>
+                      <td className="py-2 px-4 text-right font-medium">
+                        $
+                        {method.total.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
+                      <td className="py-2 px-4 text-right">
+                        $
+                        {method.feeTotal.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
+                      <td className="py-2 px-4 text-right font-medium">
+                        $
+                        {method.netTotal.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
+                      <td className="py-2 px-4 text-right">
+                        {method.transactionCount}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </CardContent>
         </Card>
