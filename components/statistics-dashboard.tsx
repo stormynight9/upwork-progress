@@ -10,6 +10,13 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { StatCard } from "@/components/stat-card";
 import type { StatisticsResult } from "@/lib/statistics-calculator";
 
@@ -20,6 +27,30 @@ interface StatisticsDashboardProps {
 export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
   const [blurClients, setBlurClients] = useState(false);
   const [blurProjects, setBlurProjects] = useState(false);
+  const [earningsView, setEarningsView] = useState<"monthly" | "yearly">(
+    "monthly"
+  );
+
+  const yearlyEarnings = stats.monthlyEarnings
+    .reduce((acc, month) => {
+      const year = month.month.split("-")[0] || month.monthLabel.slice(-4);
+      const existing = acc.get(year) || { total: 0, count: 0 };
+      acc.set(year, {
+        total: existing.total + month.total,
+        count: existing.count + month.transactionCount,
+      });
+      return acc;
+    }, new Map<string, { total: number; count: number }>())
+    .entries();
+
+  const yearlyEarningsArray = Array.from(yearlyEarnings)
+    .map(([year, data]) => ({
+      year,
+      total: data.total,
+      transactionCount: data.count,
+    }))
+    .sort((a, b) => a.year.localeCompare(b.year));
+
   return (
     <div className="space-y-6">
       {/* Financial Summary Cards */}
@@ -377,9 +408,31 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
       {stats.monthlyEarnings.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Monthly Earnings Trend</CardTitle>
+            <div className="flex items-center justify-between gap-4">
+              <CardTitle>
+                {earningsView === "monthly"
+                  ? "Monthly Earnings Trend"
+                  : "Yearly Earnings Trend"}
+              </CardTitle>
+              <Select
+                defaultValue="monthly"
+                onValueChange={(value) =>
+                  setEarningsView(value as "monthly" | "yearly")
+                }
+              >
+                <SelectTrigger size="sm" className="min-w-[120px]">
+                  <SelectValue className="capitalize" />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="yearly">Yearly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <CardDescription>
-              Earnings breakdown by month (sorted chronologically)
+              {earningsView === "monthly"
+                ? "Earnings breakdown by month (sorted chronologically)"
+                : "Earnings breakdown by year (sorted chronologically)"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -387,7 +440,9 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-2 px-4 font-medium">Month</th>
+                    <th className="text-left py-2 px-4 font-medium">
+                      {earningsView === "monthly" ? "Month" : "Year"}
+                    </th>
                     <th className="text-right py-2 px-4 font-medium">
                       Earnings
                     </th>
@@ -397,21 +452,28 @@ export function StatisticsDashboard({ stats }: StatisticsDashboardProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {stats.monthlyEarnings.map((month, index) => (
+                  {(earningsView === "monthly"
+                    ? stats.monthlyEarnings
+                    : yearlyEarningsArray
+                  ).map((period, index) => (
                     <tr
                       key={index}
                       className="border-b last:border-0 hover:bg-muted/50 transition-colors"
                     >
-                      <td className="py-2 px-4">{month.monthLabel}</td>
+                      <td className="py-2 px-4">
+                        {"monthLabel" in period
+                          ? period.monthLabel
+                          : period.year}
+                      </td>
                       <td className="py-2 px-4 text-right font-medium">
                         $
-                        {month.total.toLocaleString(undefined, {
+                        {period.total.toLocaleString(undefined, {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
                       </td>
                       <td className="py-2 px-4 text-right">
-                        {month.transactionCount}
+                        {period.transactionCount}
                       </td>
                     </tr>
                   ))}
